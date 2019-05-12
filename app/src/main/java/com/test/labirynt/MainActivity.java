@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
     @Override
     public void onSensorChanged(SensorEvent event) {
         TextView textView = findViewById(R.id.textView);
-        //onZdarzenie("X:" + event.values[0] + "Y:" + event.values[1] + "Z:" + event.values[2]);
-        //Log.d("MAIN ACTIVITY","X:" + event.values[0] + "Y:" + event.values[1] + "Z:" + event.values[2]);
+
+
     }
 
     @Override
