@@ -24,7 +24,7 @@ public class FragmentInfo extends Fragment implements  SensorEventListener {
     SensorManager mySM;
     Sensor sensor;
 
-    private final int padding = 5;
+    private final int padding =8 ;
     private final int velocity = 10;
     private final double sensitivity = 3d;
     private ArrayList<Wall> walls;
@@ -55,15 +55,15 @@ public class FragmentInfo extends Fragment implements  SensorEventListener {
 
 
 
-         textView.setText("Left" + player.getLeft());
-         textView2.setText("Right" + player.getRight());
-         textView3.setText("Top" + player.getTop());
-         textView6.setText("Bottom" + player.getBottom());
-
-        textView7.setText("Left" + walls.get(0).getLeft());
-        textView8.setText("Right" + walls.get(0).getRight());
-        textView9.setText("Top" + walls.get(0).getTop());
-        textView10.setText("Bottom" + walls.get(0).getBottom());
+//         textView.setText("Left" + player.getLeft());
+//         textView2.setText("Right" + player.getRight());
+//         textView3.setText("Top" + player.getTop());
+//         textView6.setText("Bottom" + player.getBottom());
+//
+//        textView7.setText("Left" + walls.get(0).getLeft());
+//        textView8.setText("Right" + walls.get(0).getRight());
+//        textView9.setText("Top" + walls.get(0).getTop());
+//        textView10.setText("Bottom" + walls.get(0).getBottom());
 
 
         if(player.getLeft()==0)
@@ -146,13 +146,13 @@ public class FragmentInfo extends Fragment implements  SensorEventListener {
 //        updateWallsPos();
         for(Wall wall:walls){
             if(!wall.isHorizontal()) {
-                if (player.getRight() + padding >= wall.getLeft() &&
+                if (player.getRight() + padding + 2 >= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (player.getTop() <= wall.getBottom() && player.getTop() >= wall.getTop() ||
                                 player.getBottom() <= wall.getBottom() && player.getBottom() >= wall.getTop()))
                     return true;
             }else{
-                if (player.getRight() + padding >= wall.getLeft() &&
+                if (player.getRight() + padding + 2>= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (wall.getTop() <= player.getBottom() && wall.getTop() >= player.getTop() ||
                                 wall.getBottom() <= player.getBottom() && wall.getBottom() >= player.getTop()))
@@ -188,13 +188,13 @@ public class FragmentInfo extends Fragment implements  SensorEventListener {
 //        updateWallsPos();
         for(Wall wall:walls){
             if(!wall.isHorizontal()) {
-                if (player.getTop() - padding - 4 <= wall.getBottom() &&
+                if (player.getTop() - padding  <= wall.getBottom() &&
                         player.getBottom() > wall.getBottom() &&
                         (wall.getLeft() <= player.getRight() && wall.getLeft() >= player.getLeft() ||
                                 wall.getRight() <= player.getRight() && wall.getRight() >= player.getLeft()))
                     return true;
             }else{
-                if (player.getTop() - padding - 4 <= wall.getBottom() &&
+                if (player.getTop() - padding <= wall.getBottom() &&
                         player.getBottom() > wall.getBottom() &&
                         (player.getLeft() <= wall.getRight() && player.getLeft() >= wall.getLeft() ||
                                 player.getRight() <= wall.getRight() && player.getRight() >= wall.getLeft()))
@@ -248,6 +248,23 @@ public class FragmentInfo extends Fragment implements  SensorEventListener {
         //HERE ADD WALLS
         walls.add(new Wall(mainActivity.findViewById(R.id.wall)));
         walls.add(new Wall(mainActivity.findViewById(R.id.wall2),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall3)));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall4)));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall5)));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall6)));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall7),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall8),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall9),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall10),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall11),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall12),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall13),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall14),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall15),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall16),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall17),true));
+        walls.add(new Wall(mainActivity.findViewById(R.id.wall18),true));
+
 
         for(Wall wall : walls){
             wall.setPos(wall.getView().getX(),
