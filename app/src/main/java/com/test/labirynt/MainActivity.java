@@ -1,6 +1,7 @@
 package com.test.labirynt;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
         viewPager = (ViewPager) findViewById(R.id.viewpager_id);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFragment(new FragmentInfo(),"Labirynt");
+        adapter.addFragment(new FragmentMenu(),"Menu");
         adapter.addFragment(new FragmentGame(),"Second");
 
         viewPager.setAdapter(adapter);
@@ -72,6 +74,11 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void newGame(View view) {
+        Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
     }
 }
 //        List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_ALL);
