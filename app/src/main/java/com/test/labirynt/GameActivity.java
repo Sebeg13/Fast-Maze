@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,27 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private final float playerStartingX=1;
     private final float playerStartingY=1;
 
+    //TO TIME
+    TextView timerTextView;
+    long startTime = 0;
+
+    Handler timerHandler  = new Handler();
+    Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long milis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (milis/1000);
+            int minutes  = seconds / 60;
+            seconds = seconds%60;
+
+            timerTextView.setText(String.format("%d:%02d",minutes,seconds));
+
+            timerHandler.postDelayed(this,500);
+        }
+    };
+
+    //-TO TIME
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +71,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         wallsAdd();
         player = new Player(findViewById(R.id.player));
 
+        timerTextView = (TextView) findViewById(R.id.timerTextView);
+        startTime = System.currentTimeMillis();
+        timerHandler.postDelayed(timerRunnable,0);
+
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timerHandler.removeCallbacks(timerRunnable);
 
+    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -164,6 +195,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
         return false;
     }
+
+
 
     private boolean willBeTopCollision() {
         updatePlayerPos();
