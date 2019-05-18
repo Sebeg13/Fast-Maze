@@ -4,6 +4,36 @@ import android.view.View;
 
 public class Thing {
     private View view;
+    private int r;
+
+    public float getCenterX() {
+        return centerX;
+    }
+
+    public void setCenterX(float centerX) {
+        this.centerX = centerX;
+    }
+
+    public float getCenterY() {
+        return centerY;
+    }
+
+    public void setCenterY(float centerY) {
+        this.centerY = centerY;
+    }
+
+    private float centerX;
+    private float centerY;
+
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
+
+
 
     public Float getLeft() {
         return left;
@@ -29,6 +59,7 @@ public class Thing {
 
     Thing(View view) {
         this.view = view;
+        r = view.getWidth()/2;
     }
     public View getView() {
         return view;
@@ -39,6 +70,9 @@ public class Thing {
         this.right = right;
         this.top = top;
         this.bottom = bottom;
+
+        centerX = (right - left)/2;
+        centerY = (bottom-top)/2;
     }
     public void moveRight(){
         view.setX(view.getX() + velocity);
@@ -52,4 +86,5 @@ public class Thing {
     public void moveDown(){
         view.setY(view.getY() + velocity);
     }
+
 }
