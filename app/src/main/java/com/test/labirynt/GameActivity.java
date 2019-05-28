@@ -20,19 +20,16 @@ import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
 
-
     View view;
-    FragmentInfo.onZdarzenieListener aListener;
-    MainActivity mainActivity;
     SensorManager mySM;
     Sensor sensor;
 
-    private final int padding =8 ;
-    private final int velocity = 10;
+    private final int padding = 4 ;
     private final double sensitivity = 3d;
     private ArrayList<Wall> walls;
 
     private Player player;
+    private Star star;
 
     private final float playerStartingX=1;
     private final float playerStartingY=1;
@@ -46,13 +43,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void run() {
             long milis = System.currentTimeMillis() - startTime;
+            int milisec = (int)milis%1000;
             int seconds = (int) (milis/1000);
             int minutes  = seconds / 60;
             seconds = seconds%60;
 
-            timerTextView.setText(String.format("%d:%02d",minutes,seconds));
+            timerTextView.setText(String.format("%d:%02d:%03d",minutes,seconds,milisec));
 
-            timerHandler.postDelayed(this,500);
+            timerHandler.postDelayed(this,50);
         }
     };
 
@@ -66,10 +64,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         mySM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = mySM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mySM.registerListener(GameActivity.this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mySM.registerListener(GameActivity.this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
 
         wallsAdd();
         player = new Player(findViewById(R.id.player));
+        star = new Star(findViewById(R.id.star));
 
         timerTextView = (TextView) findViewById(R.id.timerTextView);
         startTime = System.currentTimeMillis();
@@ -115,8 +114,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 //        textView10.setText("Bottom" + walls.get(0).getBottom());
 
 
-        if(player.getLeft()==0)
+        if(player.getLeft()==0) {
             updateWallsPos();
+            updateStarPos();
+        }
 
         playerMove(X,Y);
         //Log.d("MAIN ACTIVITY","X:" + event.values[0] + "Y:" + event.values[1] + "Z:" + event.values[2]);
@@ -132,19 +133,24 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
+    private boolean willBeLeftCollect(){
+        updatePlayerPos();
+
+        return false;
+    }
 
     private boolean willBeLeftCollision() {
         updatePlayerPos();
 //        updateWallsPos();
         for(Wall wall:walls){
             if(!wall.isHorizontal()) {
-                if (player.getLeft() - padding - 2 <= wall.getRight() &&
+                if (player.getLeft() - padding <= wall.getRight() &&
                         player.getRight() > wall.getRight() &&
                         (player.getTop() <= wall.getBottom() && player.getTop() >= wall.getTop() ||
                                 player.getBottom() <= wall.getBottom() && player.getBottom() >= wall.getTop()))
                     return true;
             }else{
-                if (player.getLeft() - padding - 2 <= wall.getRight() &&
+                if (player.getLeft() - padding <= wall.getRight() &&
                         player.getRight() > wall.getRight() &&
                         (wall.getTop() <= player.getBottom() && wall.getTop() >= player.getTop() ||
                                 wall.getBottom() <= player.getBottom() && wall.getBottom() >= player.getTop()))
@@ -159,13 +165,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 //        updateWallsPos();
         for(Wall wall:walls){
             if(!wall.isHorizontal()) {
-                if (player.getRight() + padding + 2 >= wall.getLeft() &&
+                if (player.getRight() + padding >= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (player.getTop() <= wall.getBottom() && player.getTop() >= wall.getTop() ||
                                 player.getBottom() <= wall.getBottom() && player.getBottom() >= wall.getTop()))
                     return true;
             }else{
-                if (player.getRight() + padding + 2>= wall.getLeft() &&
+                if (player.getRight() + padding>= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (wall.getTop() <= player.getBottom() && wall.getTop() >= player.getTop() ||
                                 wall.getBottom() <= player.getBottom() && wall.getBottom() >= player.getTop()))
@@ -266,7 +272,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         //HERE ADD WALLS
         walls.add(new Wall(findViewById(R.id.wall)));
-        walls.add(new Wall(findViewById(R.id.wall2),true));
+        walls.add(new Wall(findViewById(R.id.wall2)));
         walls.add(new Wall(findViewById(R.id.wall3)));
         walls.add(new Wall(findViewById(R.id.wall4)));
         walls.add(new Wall(findViewById(R.id.wall5)));
@@ -301,6 +307,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     wall.getView().getY(),
                     wall.getView().getY()+wall.getView().getHeight());
         }
+    }
+
+    public void updateStarPos(){
+        star.setPos(star.getView().getX(),
+                star.getView().getX()+star.getView().getWidth(),
+                star.getView().getY(),
+                star.getView().getY()+star.getView().getHeight());
     }
 
     private void playerMove(double X, double Y){

@@ -25,7 +25,7 @@ public class Thing {
     private Float right=0f;
     private Float bottom=0f;
     private Float top=0f;
-    private final static int velocity = 10;
+    private final static int velocity = 4;
 
     Thing(View view) {
         this.view = view;
