@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentMenu(),"Menu");
-        adapter.addFragment(new FragmentGame(),"Second");
+        adapter.addFragment(new FragmentGame(),"Info");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
