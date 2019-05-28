@@ -25,7 +25,14 @@ public class Thing {
     private Float right=0f;
     private Float bottom=0f;
     private Float top=0f;
-    private final static int velocity = 4;
+
+
+    public static int getMainVelocity() {
+        return mainVelocity;
+    }
+
+    private static final int mainVelocity = 4;
+    private static int velocity = 4;
 
     Thing(View view) {
         this.view = view;
@@ -51,5 +58,13 @@ public class Thing {
     }
     public void moveDown(){
         view.setY(view.getY() + velocity);
+    }
+
+    public static void setVelocity(int velocity) {
+        Thing.velocity = velocity;
+    }
+
+    public static int getVelocity() {
+        return velocity;
     }
 }

@@ -2,18 +2,16 @@ package com.test.labirynt;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,33 +22,47 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     SensorManager mySM;
     Sensor sensor;
 
-    private final int padding = 4 ;
+
     private final double sensitivity = 3d;
+    private final int boost = 4;
+    private final int boostTimeMilisVal = 200;
+    private final int delayMilis = 50;
+
+    private int boostTimeMilis = 0;
+
     private ArrayList<Wall> walls;
 
     private Player player;
     private Star star;
 
-    private final float playerStartingX=1;
-    private final float playerStartingY=1;
+    private final float playerStartingX = 1;
+    private final float playerStartingY = 1;
+
+    private int milisec;
+    private int seconds;
+    private int minutes;
+
+    ConstraintLayout gameLayout;
 
     //TO TIME
     TextView timerTextView;
     long startTime = 0;
 
-    Handler timerHandler  = new Handler();
+    Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
             long milis = System.currentTimeMillis() - startTime;
-            int milisec = (int)milis%1000;
-            int seconds = (int) (milis/1000);
-            int minutes  = seconds / 60;
-            seconds = seconds%60;
+            milisec = (int) milis % 1000;
+            seconds = (int) (milis / 1000);
+            minutes = seconds / 60;
+            seconds = seconds % 60;
 
-            timerTextView.setText(String.format("%d:%02d:%03d",minutes,seconds,milisec));
 
-            timerHandler.postDelayed(this,50);
+
+            timerTextView.setText(String.format("%d:%02d:%03d", minutes, seconds, milisec));
+
+            timerHandler.postDelayed(this, delayMilis);
         }
     };
 
@@ -70,12 +82,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         player = new Player(findViewById(R.id.player));
         star = new Star(findViewById(R.id.star));
 
+        gameLayout = findViewById(R.id.game_layout);
+        gameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boostTimeMilis = boostTimeMilisVal;
+                Thing.setVelocity(Thing.getMainVelocity()+boost);
+            }
+        });
+
         timerTextView = (TextView) findViewById(R.id.timerTextView);
         startTime = System.currentTimeMillis();
-        timerHandler.postDelayed(timerRunnable,0);
+        timerHandler.postDelayed(timerRunnable, 0);
 
     }
 
+    public void checkAndReduceBoost(){
+        if(boostTimeMilis>0){
+            boostTimeMilis -= delayMilis;
+        }else {
+            boostTimeMilis = 0;
+            Thing.setVelocity(Thing.getMainVelocity());
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -86,41 +115,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        TextView textView = mainActivity.findViewById(R.id.textView);
-//        TextView textView2 = mainActivity.findViewById(R.id.textView2);
-//        TextView textView3 = mainActivity.findViewById(R.id.textView3);
-//        TextView textView6 = mainActivity.findViewById(R.id.textView6);
-//
-//
-//        TextView textView7 = mainActivity.findViewById(R.id.textView7);
-//        TextView textView8 = mainActivity.findViewById(R.id.textView8);
-//        TextView textView9 = mainActivity.findViewById(R.id.textView9);
-//        TextView textView10 = mainActivity.findViewById(R.id.textView10);
-
         double X = event.values[0];
         double Y = event.values[1];
-        double Z = event.values[2];
 
-
-
-//         textView.setText("Left" + player.getLeft());
-//         textView2.setText("Right" + player.getRight());
-//         textView3.setText("Top" + player.getTop());
-//         textView6.setText("Bottom" + player.getBottom());
-//
-//        textView7.setText("Left" + walls.get(0).getLeft());
-//        textView8.setText("Right" + walls.get(0).getRight());
-//        textView9.setText("Top" + walls.get(0).getTop());
-//        textView10.setText("Bottom" + walls.get(0).getBottom());
-
-
-        if(player.getLeft()==0) {
+        if (player.getLeft() == 0) {
             updateWallsPos();
             updateStarPos();
         }
 
-        playerMove(X,Y);
-        //Log.d("MAIN ACTIVITY","X:" + event.values[0] + "Y:" + event.values[1] + "Z:" + event.values[2]);
+        checkAndReduceBoost();
+
+        playerMove(X, Y);
     }
 
     @Override
@@ -133,24 +138,49 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    private boolean willBeLeftCollect(){
+    private boolean isLeftCollect() {
         updatePlayerPos();
 
-        return false;
+
+        return (player.getLeft() <= star.getRight() &&
+                player.getRight() > star.getRight() &&
+                (player.getTop() <= star.getBottom() && player.getTop() >= star.getTop() ||
+                        player.getBottom() <= star.getBottom() && player.getBottom() >= star.getTop()));
+    }
+
+    private boolean isRightCollect() {
+        return (player.getRight() >= star.getLeft() &&
+                player.getLeft() < star.getLeft() &&
+                (player.getTop() <= star.getBottom() && player.getTop() >= star.getTop() ||
+                        player.getBottom() <= star.getBottom() && player.getBottom() >= star.getTop()));
+    }
+
+    private boolean isTopCollect() {
+        return (player.getTop() <= star.getBottom() &&
+                player.getBottom() > star.getBottom() &&
+                (star.getLeft() <= player.getRight() && star.getLeft() >= player.getLeft() ||
+                        star.getRight() <= player.getRight() && star.getRight() >= player.getLeft()));
+    }
+
+    private boolean isBottomCollect() {
+        return (player.getBottom() >= star.getTop() &&
+                player.getTop() < star.getTop() &&
+                (star.getLeft() <= player.getRight() && star.getLeft() >= player.getLeft() ||
+                        star.getRight() <= player.getRight() && star.getRight() >= player.getLeft()));
     }
 
     private boolean willBeLeftCollision() {
         updatePlayerPos();
 //        updateWallsPos();
-        for(Wall wall:walls){
-            if(!wall.isHorizontal()) {
-                if (player.getLeft() - padding <= wall.getRight() &&
+        for (Wall wall : walls) {
+            if (!wall.isHorizontal()) {
+                if (player.getLeft() - Thing.getVelocity() <= wall.getRight() &&
                         player.getRight() > wall.getRight() &&
                         (player.getTop() <= wall.getBottom() && player.getTop() >= wall.getTop() ||
                                 player.getBottom() <= wall.getBottom() && player.getBottom() >= wall.getTop()))
                     return true;
-            }else{
-                if (player.getLeft() - padding <= wall.getRight() &&
+            } else {
+                if (player.getLeft() - Thing.getVelocity() <= wall.getRight() &&
                         player.getRight() > wall.getRight() &&
                         (wall.getTop() <= player.getBottom() && wall.getTop() >= player.getTop() ||
                                 wall.getBottom() <= player.getBottom() && wall.getBottom() >= player.getTop()))
@@ -163,15 +193,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private boolean willBeRightCollision() {
         updatePlayerPos();
 //        updateWallsPos();
-        for(Wall wall:walls){
-            if(!wall.isHorizontal()) {
-                if (player.getRight() + padding >= wall.getLeft() &&
+        for (Wall wall : walls) {
+            if (!wall.isHorizontal()) {
+                if (player.getRight() + Thing.getVelocity() >= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (player.getTop() <= wall.getBottom() && player.getTop() >= wall.getTop() ||
                                 player.getBottom() <= wall.getBottom() && player.getBottom() >= wall.getTop()))
                     return true;
-            }else{
-                if (player.getRight() + padding>= wall.getLeft() &&
+            } else {
+                if (player.getRight() + Thing.getVelocity() >= wall.getLeft() &&
                         player.getLeft() < wall.getLeft() &&
                         (wall.getTop() <= player.getBottom() && wall.getTop() >= player.getTop() ||
                                 wall.getBottom() <= player.getBottom() && wall.getBottom() >= player.getTop()))
@@ -184,15 +214,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private boolean willBeBottomCollision() {
         updatePlayerPos();
 //        updateWallsPos();
-        for(Wall wall:walls){
-            if(!wall.isHorizontal()) {
-                if (player.getBottom() + padding >= wall.getTop() &&
+        for (Wall wall : walls) {
+            if (!wall.isHorizontal()) {
+                if (player.getBottom() + Thing.getVelocity() >= wall.getTop() &&
                         player.getTop() < wall.getTop() &&
                         (wall.getLeft() <= player.getRight() && wall.getLeft() >= player.getLeft() ||
                                 wall.getRight() <= player.getRight() && wall.getRight() >= player.getLeft()))
                     return true;
-            }else{
-                if (player.getBottom() + padding >= wall.getTop() &&
+            } else {
+                if (player.getBottom() + Thing.getVelocity() >= wall.getTop() &&
                         player.getTop() < wall.getTop() &&
                         (player.getLeft() <= wall.getRight() && player.getLeft() >= wall.getLeft() ||
                                 player.getRight() <= wall.getRight() && player.getRight() >= wall.getLeft()))
@@ -203,19 +233,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-
     private boolean willBeTopCollision() {
         updatePlayerPos();
 //        updateWallsPos();
-        for(Wall wall:walls){
-            if(!wall.isHorizontal()) {
-                if (player.getTop() - padding  <= wall.getBottom() &&
+        for (Wall wall : walls) {
+            if (!wall.isHorizontal()) {
+                if (player.getTop() - Thing.getVelocity() <= wall.getBottom() &&
                         player.getBottom() > wall.getBottom() &&
                         (wall.getLeft() <= player.getRight() && wall.getLeft() >= player.getLeft() ||
                                 wall.getRight() <= player.getRight() && wall.getRight() >= player.getLeft()))
                     return true;
-            }else{
-                if (player.getTop() - padding <= wall.getBottom() &&
+            } else {
+                if (player.getTop() - Thing.getVelocity() <= wall.getBottom() &&
                         player.getBottom() > wall.getBottom() &&
                         (player.getLeft() <= wall.getRight() && player.getLeft() >= wall.getLeft() ||
                                 player.getRight() <= wall.getRight() && player.getRight() >= wall.getLeft()))
@@ -227,13 +256,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
 
     private boolean willCrossLeftMargin() {
-        if (player.getView().getX() - padding < 0)
+        if (player.getView().getX() - Thing.getVelocity() < 0)
             return true;
         return false;
     }
 
     private boolean willCrossUpMargin() {
-        if (player.getView().getY() - padding < 0)
+        if (player.getView().getY() - Thing.getVelocity() < 0)
             return true;
         return false;
     }
@@ -242,7 +271,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 //        float mapWidth = mainActivity.findViewById(R.id.viewpager_id).getWidth();
         float mapWidth = findViewById(R.id.game_layout).getWidth();
 
-        if (player.getView().getX() + player.getView().getWidth() + padding > mapWidth)
+        if (player.getView().getX() + player.getView().getWidth() + Thing.getVelocity() > mapWidth)
             return true;
         return false;
     }
@@ -252,22 +281,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         float mapHeight = findViewById(R.id.game_layout).getHeight();
 
 
-        if (player.getView().getY() + player.getView().getHeight() + padding > mapHeight)
+        if (player.getView().getY() + player.getView().getHeight() + Thing.getVelocity() > mapHeight)
             return true;
         return false;
 
     }
 
 
-    private void updatePlayerPos(){
+    private void updatePlayerPos() {
         player.setPos(player.getView().getX(),
-                player.getView().getX()+player.getView().getWidth(),
+                player.getView().getX() + player.getView().getWidth(),
                 player.getView().getY(),
-                player.getView().getY()+player.getView().getHeight());
+                player.getView().getY() + player.getView().getHeight());
     }
 
 
-    private void wallsAdd(){
+    private void wallsAdd() {
         walls = new ArrayList<>();
 
         //HERE ADD WALLS
@@ -277,46 +306,46 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         walls.add(new Wall(findViewById(R.id.wall4)));
         walls.add(new Wall(findViewById(R.id.wall5)));
         walls.add(new Wall(findViewById(R.id.wall6)));
-        walls.add(new Wall(findViewById(R.id.wall7),true));
-        walls.add(new Wall(findViewById(R.id.wall8),true));
-        walls.add(new Wall(findViewById(R.id.wall9),true));
-        walls.add(new Wall(findViewById(R.id.wall10),true));
-        walls.add(new Wall(findViewById(R.id.wall11),true));
-        walls.add(new Wall(findViewById(R.id.wall12),true));
-        walls.add(new Wall(findViewById(R.id.wall13),true));
-        walls.add(new Wall(findViewById(R.id.wall14),true));
-        walls.add(new Wall(findViewById(R.id.wall15),true));
-        walls.add(new Wall(findViewById(R.id.wall16),true));
-        walls.add(new Wall(findViewById(R.id.wall17),true));
-        walls.add(new Wall(findViewById(R.id.wall18),true));
+        walls.add(new Wall(findViewById(R.id.wall7), true));
+        walls.add(new Wall(findViewById(R.id.wall8), true));
+        walls.add(new Wall(findViewById(R.id.wall9), true));
+        walls.add(new Wall(findViewById(R.id.wall10), true));
+        walls.add(new Wall(findViewById(R.id.wall11), true));
+        walls.add(new Wall(findViewById(R.id.wall12), true));
+        walls.add(new Wall(findViewById(R.id.wall13), true));
+        walls.add(new Wall(findViewById(R.id.wall14), true));
+        walls.add(new Wall(findViewById(R.id.wall15), true));
+        walls.add(new Wall(findViewById(R.id.wall16), true));
+        walls.add(new Wall(findViewById(R.id.wall17), true));
+        walls.add(new Wall(findViewById(R.id.wall18), true));
 
 
-        for(Wall wall : walls){
+        for (Wall wall : walls) {
             wall.setPos(wall.getView().getX(),
-                    wall.getView().getX()+wall.getView().getWidth(),
+                    wall.getView().getX() + wall.getView().getWidth(),
                     wall.getView().getY(),
-                    wall.getView().getY()+wall.getView().getHeight());
+                    wall.getView().getY() + wall.getView().getHeight());
         }
 
     }
 
-    public void updateWallsPos(){
-        for(Wall wall : walls){
+    public void updateWallsPos() {
+        for (Wall wall : walls) {
             wall.setPos(wall.getView().getX(),
-                    wall.getView().getX()+wall.getView().getWidth(),
+                    wall.getView().getX() + wall.getView().getWidth(),
                     wall.getView().getY(),
-                    wall.getView().getY()+wall.getView().getHeight());
+                    wall.getView().getY() + wall.getView().getHeight());
         }
     }
 
-    public void updateStarPos(){
+    public void updateStarPos() {
         star.setPos(star.getView().getX(),
-                star.getView().getX()+star.getView().getWidth(),
+                star.getView().getX() + star.getView().getWidth(),
                 star.getView().getY(),
-                star.getView().getY()+star.getView().getHeight());
+                star.getView().getY() + star.getView().getHeight());
     }
 
-    private void playerMove(double X, double Y){
+    private void playerMove(double X, double Y) {
         if (X < -sensitivity && !willCrossRightMargin() && !willBeRightCollision()) {
 
             player.moveRight();
@@ -324,11 +353,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         if (X > sensitivity && !willCrossLeftMargin() && !willBeLeftCollision()) {
             player.moveLeft();
         }
-        if (Y < -sensitivity && !willCrossUpMargin() && !willBeTopCollision())  {
+        if (Y < -sensitivity && !willCrossUpMargin() && !willBeTopCollision()) {
             player.moveUp();
         }
         if (Y > sensitivity && !willCrossDownMargin() && !willBeBottomCollision()) {
             player.moveDown();
         }
+
+        if (isBottomCollect() || isLeftCollect() || isRightCollect() || isTopCollect()) {
+            stopGame();
+            star.getView().setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+    private void stopGame() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("time", String.format("%d:%02d:%03d", minutes, seconds, milisec));
+        returnIntent.putExtra("timeMilis", String.valueOf(minutes * 60 * 100 + seconds * 1000 + milisec));
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 }

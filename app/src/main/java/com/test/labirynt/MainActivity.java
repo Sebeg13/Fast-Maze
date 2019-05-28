@@ -1,24 +1,20 @@
 package com.test.labirynt;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements FragmentInfo.onZdarzenieListener, SensorEventListener {
+public class MainActivity extends AppCompatActivity implements FragmentMenu.onZdarzenieListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -34,6 +30,12 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
 
     Sensor mySensor;
 
+    TextView bestTimeTv, lastTimeTv;
+
+    int bestTimeMilis = 1000000000;
+
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,41 +46,74 @@ public class MainActivity extends AppCompatActivity implements FragmentInfo.onZd
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentMenu(),"Menu");
-        adapter.addFragment(new FragmentGame(),"Info");
+        adapter.addFragment(new FragmentInfo(),"Info");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        mySM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mySensor = mySM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        mySM.registerListener(MainActivity.this,mySensor,SensorManager.SENSOR_DELAY_GAME);
+        sharedPreferences = getSharedPreferences("Times", MODE_PRIVATE);
+        bestTimeMilis = restoreBestTimeInMilis();
 
 
     }
+
 
     @Override
     public void onZdarzenie() {
-
-
-    }
-
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        TextView textView = findViewById(R.id.textView);
-
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        bestTimeTv = findViewById(R.id.bestTimeValTv);
     }
 
     public void newGame(View view) {
         Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode == Activity.RESULT_OK) {
+                String time = data.getStringExtra("time");
+                int lastTimeMilis = Integer.parseInt(data.getStringExtra("timeMilis"));
+                lastTimeTv = findViewById(R.id.lastTimeValTv);
+                if(bestTimeMilis>lastTimeMilis) {
+                    bestTimeMilis = lastTimeMilis;
+                    Toast.makeText(getApplicationContext(), "New best time!", Toast.LENGTH_SHORT).show();
+                    bestTimeTv.setText(time);
+                }
+                lastTimeTv.setText(time);
+               // Toast.makeText(getApplicationContext(), "Your time - " + time, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public int restoreBestTimeInMilis(){
+        return Integer.parseInt(sharedPreferences.getString("bestTimeMilis","1000000000"));
+    }
+
+    public void saveBestTimeInMilis(){
+        SharedPreferences.Editor sharedEditor = sharedPreferences.edit();
+        sharedEditor.putString("bestTimeMilis",String.valueOf(bestTimeMilis));
+        sharedEditor.commit();
+    }
+
+    public void setBestTimeTv(){
+            int milisec = bestTimeMilis % 1000;
+            int seconds = bestTimeMilis / 1000;
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+            bestTimeTv.setText(String.format("%d:%02d:%03d", minutes, seconds, milisec));
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveBestTimeInMilis();
+    }
+
+    public void setBestTimeTv(View view){
+        bestTimeTv = (TextView) view;
     }
 }
 //        List<Sensor> sensors = sm.getSensorList(Sensor.TYPE_ALL);

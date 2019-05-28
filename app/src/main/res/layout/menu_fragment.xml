@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".FragmentMenu"
+    android:id="@+id/fragment_menu"
     >
     <!--android:background="@color/backgroundColorMenu">-->
 
@@ -45,4 +46,52 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lastTimeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="40dp"
+        android:text="@string/lastTime"
+        style="@style/TimeText"
+        app:layout_constraintBottom_toTopOf="@+id/bestTimeTv"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/bestTimeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="80dp"
+        android:text="@string/bestTime"
+        style="@style/TimeText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/lastTimeValTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="40dp"
+        android:text=""
+        style="@style/TimeText"
+        app:layout_constraintBottom_toTopOf="@+id/bestTimeValTv"
+        app:layout_constraintStart_toEndOf="@+id/lastTimeTv" />
+
+    <TextView
+        android:id="@+id/bestTimeValTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="80dp"
+        android:text=""
+        style="@style/TimeText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bestTimeTv" />
 </android.support.constraint.ConstraintLayout>
