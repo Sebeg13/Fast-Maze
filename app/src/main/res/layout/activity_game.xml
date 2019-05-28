@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/game_layout"
-    android:background="@color/backgroundColorGame">
+    android:background="@drawable/gamebackground">
 
     <TextView
         android:id="@+id/textView"
@@ -16,6 +16,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="236dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,6 +28,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="272dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,6 +40,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="320dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,6 +52,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="356dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,6 +64,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="228dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,6 +76,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="260dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -82,6 +88,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="312dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -93,6 +100,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="348dp"
         android:text="Info"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -307,10 +315,8 @@
         android:id="@+id/timerTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:text="TextView"
+        android:textColor="@android:color/holo_red_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
