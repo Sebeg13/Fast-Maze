@@ -3,6 +3,7 @@ package com.test.labirynt;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,36 +12,41 @@ import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
 
+
     View view;
     SensorManager mySM;
     Sensor sensor;
 
-
     private final double sensitivity = 3d;
-    private final int boost = 4;
-    private final int boostTimeMilisVal = 200;
+    private final int boost = 1;
+    private final int boostTimeMilisVal = 100;
+    private final int maxboostTimeMilis = 500;
     private final int delayMilis = 50;
 
     private int boostTimeMilis = 0;
+
+
 
     private ArrayList<Wall> walls;
 
     private Player player;
     private Star star;
 
-    private final float playerStartingX = 1;
-    private final float playerStartingY = 1;
+    private ProgressBar progressBar;
 
     private int milisec;
     private int seconds;
     private int minutes;
+
 
     ConstraintLayout gameLayout;
 
@@ -52,21 +58,21 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            long milis = System.currentTimeMillis() - startTime;
-            milisec = (int) milis % 1000;
-            seconds = (int) (milis / 1000);
-            minutes = seconds / 60;
-            seconds = seconds % 60;
+                long milis = System.currentTimeMillis() - startTime;
+                milisec = (int) milis % 1000;
+                seconds = (int) (milis / 1000);
+                minutes = seconds / 60;
+                seconds = seconds % 60;
 
+                checkAndReduceBoost();
+                timerTextView.setText(String.format("%d:%02d:%03d", minutes, seconds, milisec));
 
-
-            timerTextView.setText(String.format("%d:%02d:%03d", minutes, seconds, milisec));
-
-            timerHandler.postDelayed(this, delayMilis);
+                timerHandler.postDelayed(this, delayMilis);
         }
     };
 
     //-TO TIME
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         sensor = mySM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mySM.registerListener(GameActivity.this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
 
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setMax(maxboostTimeMilis);
+
         wallsAdd();
         player = new Player(findViewById(R.id.player));
         star = new Star(findViewById(R.id.star));
@@ -86,8 +95,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         gameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boostTimeMilis = boostTimeMilisVal;
-                Thing.setVelocity(Thing.getMainVelocity()+boost);
+                boostTimeMilis += boostTimeMilisVal;
+                Thing.setVelocity(Thing.getMainVelocity() + boost *(1+ boostTimeMilisVal/100));
+
             }
         });
 
@@ -95,22 +105,26 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
 
+
     }
 
-    public void checkAndReduceBoost(){
-        if(boostTimeMilis>0){
+
+    public void checkAndReduceBoost() {
+        if (boostTimeMilis > 0) {
             boostTimeMilis -= delayMilis;
-        }else {
+
+        } else {
             boostTimeMilis = 0;
             Thing.setVelocity(Thing.getMainVelocity());
         }
+
+        progressBar.setProgress(boostTimeMilis);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         timerHandler.removeCallbacks(timerRunnable);
-
     }
 
     @Override
@@ -122,8 +136,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             updateWallsPos();
             updateStarPos();
         }
-
-        checkAndReduceBoost();
 
         playerMove(X, Y);
     }
@@ -373,5 +385,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         returnIntent.putExtra("timeMilis", String.valueOf(minutes * 60 * 100 + seconds * 1000 + milisec));
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
+
     }
+
 }

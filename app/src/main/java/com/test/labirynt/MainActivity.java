@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentMenu(),"Menu");
-        adapter.addFragment(new FragmentInfo(),"Info");
+        adapter.addFragment(new FragmentInfo(),"Information");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
                     bestTimeTv.setText(time);
                 }
                 lastTimeTv.setText(time);
+
                // Toast.makeText(getApplicationContext(), "Your time - " + time, Toast.LENGTH_SHORT).show();
             }
         }

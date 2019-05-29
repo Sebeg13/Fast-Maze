@@ -17,7 +17,7 @@ public class FragmentInfo extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.game_fragment,container,false);
+        view = inflater.inflate(R.layout.info_fragment,container,false);
 
         return view;
     }
