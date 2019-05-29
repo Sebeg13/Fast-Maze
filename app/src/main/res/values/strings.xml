@@ -9,4 +9,5 @@
     <string name="instructionContent1">All you have to do is to get to the star as quick as you can.</string>
     <string name="instructionContent2">Click the screen as often as it is possible, in order to speed up the bird.</string>
     <string name="author">Author: Sebastian Lauks</string>
+    <string name="resetTimeBtn">RESET</string>
 </resources>

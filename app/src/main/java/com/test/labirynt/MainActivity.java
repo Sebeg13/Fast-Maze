@@ -18,21 +18,14 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    SensorManager mySM;
-
-    public SensorManager getMySM() {
-        return mySM;
-    }
-
-    public Sensor getMySensor() {
-        return mySensor;
-    }
-
-    Sensor mySensor;
 
     TextView bestTimeTv, lastTimeTv;
 
-    int bestTimeMilis = 1000000000;
+    public void setBestTimeMilis(int bestTimeMilis) {
+        this.bestTimeMilis = bestTimeMilis;
+    }
+
+    int bestTimeMilis = 0;
 
     private SharedPreferences sharedPreferences;
 
@@ -45,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
         viewPager = (ViewPager) findViewById(R.id.viewpager_id);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFragment(new FragmentMenu(),"Menu");
-        adapter.addFragment(new FragmentInfo(),"Information");
+        adapter.addFragment(new FragmentMenu(), "Menu");
+        adapter.addFragment(new FragmentInfo(), "Information");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -71,40 +64,43 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1){
-            if(resultCode == Activity.RESULT_OK) {
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
                 String time = data.getStringExtra("time");
                 int lastTimeMilis = Integer.parseInt(data.getStringExtra("timeMilis"));
                 lastTimeTv = findViewById(R.id.lastTimeValTv);
-                if(bestTimeMilis>lastTimeMilis) {
+                if (bestTimeMilis > lastTimeMilis || bestTimeMilis==0) {
                     bestTimeMilis = lastTimeMilis;
                     Toast.makeText(getApplicationContext(), "New best time!", Toast.LENGTH_SHORT).show();
                     bestTimeTv.setText(time);
                 }
                 lastTimeTv.setText(time);
 
-               // Toast.makeText(getApplicationContext(), "Your time - " + time, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), "Your time - " + time, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public int restoreBestTimeInMilis(){
-        return Integer.parseInt(sharedPreferences.getString("bestTimeMilis","1000000000"));
+    public int restoreBestTimeInMilis() {
+        return Integer.parseInt(sharedPreferences.getString("bestTimeMilis", "0"));
     }
 
-    public void saveBestTimeInMilis(){
+    public void saveBestTimeInMilis() {
         SharedPreferences.Editor sharedEditor = sharedPreferences.edit();
-        sharedEditor.putString("bestTimeMilis",String.valueOf(bestTimeMilis));
+        sharedEditor.putString("bestTimeMilis", String.valueOf(bestTimeMilis));
         sharedEditor.commit();
     }
 
-    public void setBestTimeTv(){
+    public void setBestTimeTv() {
+        if (bestTimeMilis == 0)
+            bestTimeTv.setText("");
+        else {
             int milisec = bestTimeMilis % 1000;
             int seconds = bestTimeMilis / 1000;
             int minutes = seconds / 60;
             seconds = seconds % 60;
             bestTimeTv.setText(String.format("%d:%02d:%03d", minutes, seconds, milisec));
-
+        }
     }
 
     @Override
@@ -113,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMenu.onZd
         saveBestTimeInMilis();
     }
 
-    public void setBestTimeTv(View view){
+    public void setBestTimeTv(View view) {
         bestTimeTv = (TextView) view;
     }
 }
