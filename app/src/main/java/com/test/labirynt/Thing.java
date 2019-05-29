@@ -1,9 +1,11 @@
 package com.test.labirynt;
 
 import android.view.View;
+import android.widget.ImageView;
 
 public class Thing {
     private View view;
+    private ImageView imageView;
 
     public Float getLeft() {
         return left;

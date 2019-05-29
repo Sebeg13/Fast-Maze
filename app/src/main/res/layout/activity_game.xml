@@ -17,7 +17,7 @@
         android:layout_marginTop="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/wall12"
-        app:srcCompat="@drawable/player" />
+        app:srcCompat="@drawable/player1" />
 
     <ImageView
         android:id="@+id/wall"

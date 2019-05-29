@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -110,12 +111,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
 
     public void checkAndReduceBoost() {
+        ImageView imageView = (ImageView)player.getView();
         if (boostTimeMilis > 0) {
             boostTimeMilis -= delayMilis;
+            imageView.setImageResource(R.drawable.player2);
+
 
         } else {
             boostTimeMilis = 0;
             Thing.setVelocity(Thing.getMainVelocity());
+            imageView.setImageResource(R.drawable.player1);
         }
 
         progressBar.setProgress(boostTimeMilis);
