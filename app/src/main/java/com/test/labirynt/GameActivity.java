@@ -115,6 +115,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         if (boostTimeMilis > 0) {
             boostTimeMilis -= delayMilis;
             imageView.setImageResource(R.drawable.player2);
+            if(boostTimeMilis>=200)
+            imageView.setImageResource(R.drawable.player2motion);
 
 
         } else {
